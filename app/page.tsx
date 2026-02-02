@@ -416,13 +416,14 @@ function PreparationPage({
   title, 
   subtitle,
   bgGradient,
-  onNext 
+  onNext,
 }: { 
   step: number
   title: string
   subtitle: string
   bgGradient: string
-  onNext: () => void 
+  onNext: () => void
+  photo: string
 }) {
   // step 3 = index 0, step 4 = index 1, etc.
   const photoIndex = step - 3
