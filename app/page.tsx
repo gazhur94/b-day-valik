@@ -1,11 +1,13 @@
 "use client"
 
 import React from "react"
-
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Star, Heart, Crown, ArrowRight, Music, Mic2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import { getPhotoForStep } from "@/lib/photos"
+
 
 // Floating sparkle elements - Korean style soft particles
 function FloatingSparkles() {
@@ -141,37 +143,61 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
   )
 }
 
-// Photo placeholder with Korean style frame
-function PhotoPlaceholder({ text = "Фото Валіка" }: { text?: string }) {
+// Photo component with Korean style frame
+function PhotoFrame({ 
+  stepIndex, 
+  text = "Фото Валіка" 
+}: { 
+  stepIndex?: number
+  text?: string 
+}) {
+  const photo = stepIndex !== undefined ? getPhotoForStep(stepIndex) : null
+  const [imageError, setImageError] = useState(false)
+  const hasValidPhoto = photo && !imageError
+  
   return (
     <motion.div 
       className="relative w-full max-w-xs aspect-[3/4] bg-cream rounded-3xl border-2 border-rose/20 flex items-center justify-center overflow-hidden shadow-lg"
       whileHover={{ scale: 1.02, rotate: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Soft gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-rose/10 via-transparent to-lavender/10" />
+      {/* Photo or placeholder */}
+      {hasValidPhoto ? (
+        <Image
+          src={photo.src || "/placeholder.svg"}
+          alt={photo.alt}
+          fill
+          className="object-cover"
+          onError={() => setImageError(true)}
+          sizes="(max-width: 768px) 100vw, 320px"
+        />
+      ) : (
+        <>
+          {/* Soft gradient overlay for placeholder */}
+          <div className="absolute inset-0 bg-gradient-to-br from-rose/10 via-transparent to-lavender/10" />
+          
+          <div className="text-center z-10 px-4">
+            <motion.div
+              className="w-20 h-20 mx-auto mb-4 rounded-full bg-lavender/20 flex items-center justify-center"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <Star className="w-8 h-8 text-lavender" />
+            </motion.div>
+            <p className="text-muted-foreground font-medium text-sm">{text}</p>
+          </div>
+        </>
+      )}
       
-      {/* Korean style decorative frame corners */}
-      <div className="absolute top-3 left-3 w-8 h-8 border-l-2 border-t-2 border-rose/40 rounded-tl-xl" />
-      <div className="absolute top-3 right-3 w-8 h-8 border-r-2 border-t-2 border-rose/40 rounded-tr-xl" />
-      <div className="absolute bottom-3 left-3 w-8 h-8 border-l-2 border-b-2 border-rose/40 rounded-bl-xl" />
-      <div className="absolute bottom-3 right-3 w-8 h-8 border-r-2 border-b-2 border-rose/40 rounded-br-xl" />
-      
-      <div className="text-center z-10 px-4">
-        <motion.div
-          className="w-20 h-20 mx-auto mb-4 rounded-full bg-lavender/20 flex items-center justify-center"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <Star className="w-8 h-8 text-lavender" />
-        </motion.div>
-        <p className="text-muted-foreground font-medium text-sm">{text}</p>
-      </div>
+      {/* Korean style decorative frame corners - always visible */}
+      <div className="absolute top-3 left-3 w-8 h-8 border-l-2 border-t-2 border-rose/40 rounded-tl-xl z-10" />
+      <div className="absolute top-3 right-3 w-8 h-8 border-r-2 border-t-2 border-rose/40 rounded-tr-xl z-10" />
+      <div className="absolute bottom-3 left-3 w-8 h-8 border-l-2 border-b-2 border-rose/40 rounded-bl-xl z-10" />
+      <div className="absolute bottom-3 right-3 w-8 h-8 border-r-2 border-b-2 border-rose/40 rounded-br-xl z-10" />
       
       {/* Floating hearts */}
       <motion.div 
-        className="absolute top-6 right-6"
+        className="absolute top-6 right-6 z-20"
         animate={{ y: [0, -5, 0], scale: [1, 1.1, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
@@ -398,6 +424,9 @@ function PreparationPage({
   bgGradient: string
   onNext: () => void 
 }) {
+  // step 3 = index 0, step 4 = index 1, etc.
+  const photoIndex = step - 3
+  
   return (
     <motion.div 
       className={`min-h-screen flex flex-col items-center p-6 pt-20 ${bgGradient}`}
@@ -427,7 +456,7 @@ function PreparationPage({
         </h2>
         <p className="text-sm text-muted-foreground mb-6">{subtitle}</p>
         
-        <PhotoPlaceholder />
+        <PhotoFrame stepIndex={photoIndex} />
         
         <motion.div
           className="mt-8"
