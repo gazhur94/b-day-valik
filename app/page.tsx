@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Star, Heart, Crown, ArrowRight, Music, Mic2, ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { getPhotoForStep, type StepPhoto } from "@/lib/photos"
+import { getPhotoForStep, isBeforeAfter, isSinglePhoto, type StepPhoto } from "@/lib/photos"
 
 // Kawaii floating elements - cute Korean style
 function FloatingKawaii() {
@@ -178,6 +178,96 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
   )
 }
 
+// Single Photo component with cute Korean style
+function SinglePhotoFrame({ 
+  stepIndex,
+  onViewed
+}: { 
+  stepIndex: number
+  onViewed: () => void
+}) {
+  const photos = getPhotoForStep(stepIndex)
+  const [imageError, setImageError] = useState(false)
+  
+  useEffect(() => {
+    setImageError(false)
+    // Auto-mark as viewed after a short delay
+    const timer = setTimeout(() => {
+      onViewed()
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [stepIndex, onViewed])
+  
+  const photoData = photos && isSinglePhoto(photos) ? photos.photo : null
+  const hasValidPhoto = photoData && !imageError
+  
+  return (
+    <div className="flex flex-col items-center gap-4">
+      {/* Photo frame with cute Korean webtoon style */}
+      <motion.div 
+        className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
+          padding: "6px",
+          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white"
+        }}
+        whileHover={{ scale: 1.02, rotate: 1 }}
+        transition={{ duration: 0.3 }}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+      >
+        <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-white">
+          {hasValidPhoto ? (
+            <Image
+              src={photoData.src || "/placeholder.svg"}
+              alt={photoData.alt}
+              fill
+              className="object-cover"
+              onError={() => setImageError(true)}
+              sizes="(max-width: 768px) 100vw, 320px"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+              <motion.div
+                className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center mb-4 shadow-lg"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 10, -10, 0]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <span className="text-4xl">⭐</span>
+              </motion.div>
+              <p className="text-pink-400 font-bold text-sm">Фото Валіка</p>
+            </div>
+          )}
+          
+          {/* Cute decorative stickers */}
+          <motion.div 
+            className="absolute top-3 right-3 z-20"
+            animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
+              <span className="text-xl">✨</span>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            className="absolute bottom-3 left-3 z-20"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <div className="px-3 py-1 rounded-full bg-white/90 shadow-lg">
+              <span className="text-xs font-bold text-pink-500">VALIK</span>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 // Before/After Photo Carousel with cute Korean style
 function BeforeAfterCarousel({ 
   stepIndex,
@@ -213,12 +303,9 @@ function BeforeAfterCarousel({
     }
   }, [viewedBefore, viewedAfter, onBothViewed])
   
-  const currentPhoto = photos?.[currentView]
+  const photoData = photos && isBeforeAfter(photos) ? photos : null
+  const currentPhoto = photoData?.[currentView]
   const hasValidPhoto = currentPhoto && !imageError[currentView]
-  
-  const toggleView = () => {
-    setCurrentView(prev => prev === "before" ? "after" : "before")
-  }
   
   return (
     <div className="flex flex-col items-center gap-4">
@@ -390,6 +477,44 @@ function BeforeAfterCarousel({
   )
 }
 
+// Universal Photo Display - chooses between single or before/after
+function PhotoDisplay({ 
+  stepIndex,
+  onCanProceed
+}: { 
+  stepIndex: number
+  onCanProceed: () => void 
+}) {
+  const photos = getPhotoForStep(stepIndex)
+  const [canProceed, setCanProceed] = useState(false)
+  
+  // Reset canProceed when step changes
+  useEffect(() => {
+    setCanProceed(false)
+  }, [stepIndex])
+  
+  useEffect(() => {
+    if (!photos) {
+      // No photo config, auto-allow proceed
+      onCanProceed()
+    }
+  }, [photos, onCanProceed])
+  
+  if (!photos) {
+    return null
+  }
+  
+  if (isSinglePhoto(photos)) {
+    return <SinglePhotoFrame stepIndex={stepIndex} onViewed={() => setCanProceed(true)} />
+  }
+  
+  if (isBeforeAfter(photos)) {
+    return <BeforeAfterCarousel stepIndex={stepIndex} onBothViewed={() => setCanProceed(true)} />
+  }
+  
+  return null
+}
+
 // Cute Korean style button
 function KawaiiButton({ 
   children, 
@@ -452,7 +577,7 @@ function WelcomePage({ onNext }: { onNext: () => void }) {
         {/* Cute badge */}
         <motion.div 
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border-2 border-pink-200 shadow-lg mb-6"
-          animate={{ scale: [1, 1.03, 1], y: [0, -3, 0] }}
+          animate={{ scale: [1, 1.03, 1], rotate: [0, 2, -2, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <span className="text-xl">🌟</span>
@@ -661,6 +786,8 @@ function PreparationPage({
 }) {
   const photoIndex = step - 3
   const [canProceed, setCanProceed] = useState(false)
+  const photos = getPhotoForStep(photoIndex)
+  const hasBeforeAfter = photos && isBeforeAfter(photos)
   
   // Reset canProceed when step changes
   useEffect(() => {
@@ -702,9 +829,9 @@ function PreparationPage({
         </h2>
         <p className="text-sm text-purple-400 mb-6 font-medium">{subtitle}</p>
         
-        <BeforeAfterCarousel 
+        <PhotoDisplay 
           stepIndex={photoIndex}
-          onBothViewed={() => setCanProceed(true)}
+          onCanProceed={() => setCanProceed(true)} 
         />
         
         <motion.div
@@ -719,9 +846,14 @@ function PreparationPage({
                 Далі
                 <ArrowRight className="ml-2 w-5 h-5" />
               </>
-            ) : (
+            ) : hasBeforeAfter ? (
               <>
                 Подивись обидві фотки
+                <BouncingDots />
+              </>
+            ) : (
+              <>
+                Зачекай...
                 <BouncingDots />
               </>
             )}

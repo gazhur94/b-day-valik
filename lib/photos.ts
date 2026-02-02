@@ -3,39 +3,47 @@
  * 
  * Як додати свої фото:
  * 1. Додайте фотографії в папку /public/photos/
- * 2. Для кожного кроку є ДВІ фотографії: "before" (до) та "after" (після)
- * 3. Назви файлів: step1-before.jpg, step1-after.jpg, step2-before.jpg, step2-after.jpg і т.д.
+ * 2. Для кожного кроку можна додати ОДНУ або ДВІ фотографії:
+ *    - Якщо ДВІ: "before" (до) та "after" (після) - step1-before.jpg, step1-after.jpg
+ *    - Якщо ОДНА: тільки "single" - step1.jpg
  * 
  * Рекомендований розмір фото: 600x800px (співвідношення 3:4)
  * Формати: .jpg, .png, .webp
  */
 
-export interface StepPhoto {
-  before: {
-    src: string
-    alt: string
-  }
-  after: {
-    src: string
-    alt: string
-  }
+export interface PhotoData {
+  src: string
+  alt: string
 }
 
+// Тип для кроку з двома фотографіями (до/після)
+export interface BeforeAfterPhoto {
+  type: "beforeAfter"
+  before: PhotoData
+  after: PhotoData
+}
+
+// Тип для кроку з однією фотографією
+export interface SinglePhoto {
+  type: "single"
+  photo: PhotoData
+}
+
+export type StepPhoto = BeforeAfterPhoto | SinglePhoto
+
 export const PHOTOS: Record<string, StepPhoto> = {
-  // Сторінка 3: Підзаряджаємо енергію
+  // Сторінка 3: Підзаряджаємо енергію - ОДНА фотка
   step1: {
-    before: {
-      src: "/photos/step1-before.jpg",
-      alt: "Валік без енергії",
-    },
-    after: {
-      src: "/photos/step1-after.jpg",
-      alt: "Валік заряджений енергією",
+    type: "single",
+    photo: {
+      src: "/photos/step1.jpg",
+      alt: "Валік заряджається енергією",
     },
   },
   
-  // Сторінка 4: Стиль на максимум
+  // Сторінка 4: Стиль на максимум - ДВІ фотки (до/після)
   step2: {
+    type: "beforeAfter",
     before: {
       src: "/photos/step2-before.jpg",
       alt: "Валік до стилізації",
@@ -46,20 +54,18 @@ export const PHOTOS: Record<string, StepPhoto> = {
     },
   },
   
-  // Сторінка 5: Харизма завантажується
+  // Сторінка 5: Харизма завантажується - ОДНА фотка
   step3: {
-    before: {
-      src: "/photos/step3-before.jpg",
-      alt: "Валік до харизми",
-    },
-    after: {
-      src: "/photos/step3-after.jpg",
+    type: "single",
+    photo: {
+      src: "/photos/step3.jpg",
       alt: "Харизматичний Валік",
     },
   },
   
-  // Сторінка 6: Режим День Народження
+  // Сторінка 6: Режим День Народження - ДВІ фотки (до/після)
   step4: {
+    type: "beforeAfter",
     before: {
       src: "/photos/step4-before.jpg",
       alt: "Валік до святкового настрою",
@@ -70,20 +76,18 @@ export const PHOTOS: Record<string, StepPhoto> = {
     },
   },
   
-  // Сторінка 7: Збираємо команду
+  // Сторінка 7: Збираємо команду - ОДНА фотка
   step5: {
-    before: {
-      src: "/photos/step5-before.jpg",
-      alt: "Валік один",
-    },
-    after: {
-      src: "/photos/step5-after.jpg",
+    type: "single",
+    photo: {
+      src: "/photos/step5.jpg",
       alt: "Валік з друзями",
     },
   },
   
-  // Сторінка 8: Фінальні штрихи
+  // Сторінка 8: Фінальні штрихи - ДВІ фотки (до/після)
   step6: {
+    type: "beforeAfter",
     before: {
       src: "/photos/step6-before.jpg",
       alt: "Валік майже готовий",
@@ -108,4 +112,14 @@ export const PHOTOS_ARRAY = [
 // Перевірка чи фото існує (для fallback до placeholder)
 export function getPhotoForStep(stepIndex: number): StepPhoto | null {
   return PHOTOS_ARRAY[stepIndex] || null
+}
+
+// Перевірка чи крок має дві фотографії
+export function isBeforeAfter(photo: StepPhoto): photo is BeforeAfterPhoto {
+  return photo.type === "beforeAfter"
+}
+
+// Перевірка чи крок має одну фотографію
+export function isSinglePhoto(photo: StepPhoto): photo is SinglePhoto {
+  return photo.type === "single"
 }
