@@ -3,40 +3,66 @@
 import React from "react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Star, Heart, Crown, ArrowRight, Music, Mic2 } from "lucide-react"
+import { Sparkles, Star, Heart, Crown, ArrowRight, Music, Mic2, ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { getPhotoForStep } from "@/lib/photos"
+import { getPhotoForStep, isBeforeAfter, isSinglePhoto, type StepPhoto } from "@/lib/photos"
 
-
-// Floating sparkle elements - Korean style soft particles
-function FloatingSparkles() {
+// Kawaii floating elements - cute Korean style
+function FloatingKawaii() {
+  const elements = ["star", "heart", "sparkle", "cloud"]
+  
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {Array.from({ length: 20 }).map((_, i) => (
+      {Array.from({ length: 25 }).map((_, i) => {
+        const el = elements[i % elements.length]
+        return (
+          <motion.div
+            key={i}
+            className="absolute"
+            initial={{ 
+              x: `${Math.random() * 100}%`,
+              y: `${Math.random() * 100}%`,
+              scale: 0,
+              opacity: 0
+            }}
+            animate={{ 
+              scale: [0, 1, 0],
+              opacity: [0, 0.7, 0],
+              y: [`${Math.random() * 100}%`, `${Math.random() * 100 - 30}%`],
+              rotate: [0, el === "star" ? 180 : 0]
+            }}
+            transition={{ 
+              duration: 4 + Math.random() * 2,
+              repeat: Infinity,
+              delay: i * 0.25,
+              ease: "easeInOut"
+            }}
+          >
+            {el === "star" && <Star className="w-4 h-4 text-yellow-300 fill-yellow-200" />}
+            {el === "heart" && <Heart className="w-3 h-3 text-pink-300 fill-pink-200" />}
+            {el === "sparkle" && <Sparkles className="w-3 h-3 text-purple-300" />}
+            {el === "cloud" && (
+              <div className="w-6 h-3 bg-white/40 rounded-full" />
+            )}
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
+// Cute bouncing dots
+function BouncingDots() {
+  return (
+    <div className="flex gap-1">
+      {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="absolute"
-          initial={{ 
-            x: `${Math.random() * 100}%`,
-            y: `${Math.random() * 100}%`,
-            scale: 0,
-            opacity: 0
-          }}
-          animate={{ 
-            scale: [0, 1, 0],
-            opacity: [0, 0.6, 0],
-            y: [`${Math.random() * 100}%`, `${Math.random() * 100 - 20}%`]
-          }}
-          transition={{ 
-            duration: 3 + Math.random() * 2,
-            repeat: Infinity,
-            delay: i * 0.3,
-            ease: "easeInOut"
-          }}
-        >
-          <Star className="w-3 h-3 text-rose fill-rose/50" />
-        </motion.div>
+          className="w-2 h-2 rounded-full bg-pink-300"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+        />
       ))}
     </div>
   )
@@ -46,25 +72,25 @@ function FloatingSparkles() {
 function LightstickEffect() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {Array.from({ length: 8 }).map((_, i) => (
+      {Array.from({ length: 10 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-20 rounded-full"
+          className="absolute w-1.5 h-24 rounded-full"
           style={{
             background: `linear-gradient(to bottom, transparent, ${
-              ["#ffc0cb", "#e6e6fa", "#b5ead7", "#ffdab9"][i % 4]
-            }, transparent)`,
-            left: `${10 + i * 12}%`,
+              ["#FFB7C5", "#E6E6FA", "#B5EAD7", "#FFDAB9", "#87CEEB"][i % 5]
+            }80, transparent)`,
+            left: `${8 + i * 10}%`,
           }}
           animate={{
             y: ["-100%", "100vh"],
-            opacity: [0, 0.4, 0],
-            scaleY: [0.5, 1, 0.5]
+            opacity: [0, 0.5, 0],
+            scaleY: [0.5, 1.2, 0.5]
           }}
           transition={{
-            duration: 4,
+            duration: 5,
             repeat: Infinity,
-            delay: i * 0.5,
+            delay: i * 0.4,
             ease: "linear"
           }}
         />
@@ -73,15 +99,15 @@ function LightstickEffect() {
   )
 }
 
-// Progress tracker with Korean aesthetic
+// Cute progress tracker with Korean webtoon aesthetic
 function ProgressTracker({ currentStep }: { currentStep: number }) {
   const steps = [
-    { icon: Sparkles, label: "Енергія" },
-    { icon: Star, label: "Стиль" },
-    { icon: Heart, label: "Харизма" },
-    { icon: Crown, label: "Свято" },
-    { icon: Mic2, label: "Репетиція" },
-    { icon: Music, label: "Фініш" },
+    { icon: Sparkles, label: "Енергія", emoji: "⚡" },
+    { icon: Star, label: "Стиль", emoji: "✨" },
+    { icon: Heart, label: "Харизма", emoji: "💖" },
+    { icon: Crown, label: "Свято", emoji: "🎂" },
+    { icon: Mic2, label: "Репетиція", emoji: "🎤" },
+    { icon: Music, label: "Фініш", emoji: "🎵" },
   ]
   
   const activeIndex = currentStep - 3
@@ -89,19 +115,23 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
   return (
     <div className="w-full max-w-2xl mx-auto mb-8 px-4">
       <div className="relative">
-        <div className="absolute top-5 left-0 right-0 h-1.5 bg-lavender/30 rounded-full" />
+        {/* Background track with cute dashed line */}
+        <div className="absolute top-6 left-0 right-0 h-2 bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100 rounded-full border-2 border-dashed border-pink-200" />
         
+        {/* Progress fill with rainbow gradient */}
         <motion.div 
-          className="absolute top-5 left-0 h-1.5 rounded-full"
-          style={{ background: "linear-gradient(90deg, #ffc0cb, #e6e6fa, #b5ead7)" }}
+          className="absolute top-6 left-0 h-2 rounded-full border-2 border-white/50"
+          style={{ 
+            background: "linear-gradient(90deg, #FFB7C5, #E6B0AA, #DDA0DD, #B5EAD7, #87CEEB)",
+            boxShadow: "0 2px 10px rgba(255, 183, 197, 0.5)"
+          }}
           initial={{ width: "0%" }}
           animate={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         />
         
         <div className="relative flex justify-between">
           {steps.map((step, index) => {
-            const Icon = step.icon
             const isActive = index <= activeIndex
             const isCurrent = index === activeIndex
             
@@ -111,26 +141,31 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
                 className="flex flex-col items-center"
                 initial={{ scale: 0.8, opacity: 0.5 }}
                 animate={{ 
-                  scale: isCurrent ? 1.15 : 1,
-                  opacity: isActive ? 1 : 0.4
+                  scale: isCurrent ? 1.2 : 1,
+                  opacity: isActive ? 1 : 0.5
                 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, type: "spring" }}
               >
+                {/* Cute circular badge */}
                 <motion.div
-                  className={`w-10 h-10 rounded-2xl flex items-center justify-center border-2 transition-all ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center border-3 transition-all ${
                     isActive 
-                      ? "bg-rose/20 border-rose text-rose" 
-                      : "bg-cream border-lavender/30 text-lavender"
+                      ? "bg-gradient-to-br from-pink-200 to-purple-200 border-white shadow-lg" 
+                      : "bg-white/80 border-pink-100"
                   }`}
+                  style={{
+                    boxShadow: isCurrent ? "0 0 20px rgba(255, 183, 197, 0.6)" : "none"
+                  }}
                   animate={isCurrent ? { 
-                    boxShadow: ["0 0 0 0 rgba(255, 182, 193, 0.4)", "0 0 0 12px rgba(255, 182, 193, 0)"]
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, -5, 0]
                   } : {}}
                   transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0 }}
                 >
-                  <Icon className="w-4 h-4" />
+                  <span className="text-lg">{step.emoji}</span>
                 </motion.div>
-                <span className={`mt-2 text-xs font-medium hidden md:block ${
-                  isActive ? "text-foreground" : "text-muted-foreground"
+                <span className={`mt-2 text-xs font-bold hidden md:block ${
+                  isActive ? "text-pink-500" : "text-gray-400"
                 }`}>
                   {step.label}
                 </span>
@@ -143,93 +178,368 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
   )
 }
 
-// Photo component with Korean style frame
-function PhotoFrame({ 
-  stepIndex, 
-  text = "Фото Валіка" 
+// Single Photo component with cute Korean style
+function SinglePhotoFrame({ 
+  stepIndex,
+  onViewed
 }: { 
-  stepIndex?: number
-  text?: string 
+  stepIndex: number
+  onViewed: () => void
 }) {
-  const photo = stepIndex !== undefined ? getPhotoForStep(stepIndex) : null
+  const photos = getPhotoForStep(stepIndex)
   const [imageError, setImageError] = useState(false)
-  const hasValidPhoto = photo && !imageError
+  
+  useEffect(() => {
+    setImageError(false)
+    // Auto-mark as viewed after a short delay
+    const timer = setTimeout(() => {
+      onViewed()
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [stepIndex, onViewed])
+  
+  const photoData = photos && isSinglePhoto(photos) ? photos.photo : null
+  const hasValidPhoto = photoData && !imageError
   
   return (
-    <motion.div 
-      className="relative w-full max-w-xs aspect-[3/4] bg-cream rounded-3xl border-2 border-rose/20 flex items-center justify-center overflow-hidden shadow-lg"
-      whileHover={{ scale: 1.02, rotate: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Photo or placeholder */}
-      {hasValidPhoto ? (
-        <Image
-          src={photo.src || "/placeholder.svg"}
-          alt={photo.alt}
-          fill
-          className="object-cover"
-          onError={() => setImageError(true)}
-          sizes="(max-width: 768px) 100vw, 320px"
-        />
-      ) : (
-        <>
-          {/* Soft gradient overlay for placeholder */}
-          <div className="absolute inset-0 bg-gradient-to-br from-rose/10 via-transparent to-lavender/10" />
-          
-          <div className="text-center z-10 px-4">
-            <motion.div
-              className="w-20 h-20 mx-auto mb-4 rounded-full bg-lavender/20 flex items-center justify-center"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Star className="w-8 h-8 text-lavender" />
-            </motion.div>
-            <p className="text-muted-foreground font-medium text-sm">{text}</p>
-          </div>
-        </>
-      )}
-      
-      {/* Korean style decorative frame corners - always visible */}
-      <div className="absolute top-3 left-3 w-8 h-8 border-l-2 border-t-2 border-rose/40 rounded-tl-xl z-10" />
-      <div className="absolute top-3 right-3 w-8 h-8 border-r-2 border-t-2 border-rose/40 rounded-tr-xl z-10" />
-      <div className="absolute bottom-3 left-3 w-8 h-8 border-l-2 border-b-2 border-rose/40 rounded-bl-xl z-10" />
-      <div className="absolute bottom-3 right-3 w-8 h-8 border-r-2 border-b-2 border-rose/40 rounded-br-xl z-10" />
-      
-      {/* Floating hearts */}
+    <div className="flex flex-col items-center gap-4">
+      {/* Photo frame with cute Korean webtoon style */}
       <motion.div 
-        className="absolute top-6 right-6 z-20"
-        animate={{ y: [0, -5, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
+          padding: "6px",
+          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white"
+        }}
+        whileHover={{ scale: 1.02, rotate: 1 }}
+        transition={{ duration: 0.3 }}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
       >
-        <Heart className="w-4 h-4 text-rose fill-rose/50" />
+        <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-white">
+          {hasValidPhoto ? (
+            <Image
+              src={photoData.src || "/placeholder.svg"}
+              alt={photoData.alt}
+              fill
+              className="object-cover"
+              onError={() => setImageError(true)}
+              sizes="(max-width: 768px) 100vw, 320px"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+              <motion.div
+                className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center mb-4 shadow-lg"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 10, -10, 0]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <span className="text-4xl">⭐</span>
+              </motion.div>
+              <p className="text-pink-400 font-bold text-sm">Фото Валіка</p>
+            </div>
+          )}
+          
+          {/* Cute decorative stickers */}
+          <motion.div 
+            className="absolute top-3 right-3 z-20"
+            animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
+              <span className="text-xl">✨</span>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            className="absolute bottom-3 left-3 z-20"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <div className="px-3 py-1 rounded-full bg-white/90 shadow-lg">
+              <span className="text-xs font-bold text-pink-500">VALIK</span>
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
-    </motion.div>
+    </div>
   )
 }
 
-// Korean style button
-function KoreanButton({ 
+// Before/After Photo Carousel with cute Korean style
+function BeforeAfterCarousel({ 
+  stepIndex,
+  onBothViewed
+}: { 
+  stepIndex: number
+  onBothViewed: () => void
+}) {
+  const photos = getPhotoForStep(stepIndex)
+  const [currentView, setCurrentView] = useState<"before" | "after">("before")
+  const [viewedBefore, setViewedBefore] = useState(false)
+  const [viewedAfter, setViewedAfter] = useState(false)
+  const [imageError, setImageError] = useState<{before: boolean, after: boolean}>({before: false, after: false})
+  
+  useEffect(() => {
+    setCurrentView("before")
+    setViewedBefore(false)
+    setViewedAfter(false)
+    setImageError({before: false, after: false})
+  }, [stepIndex])
+  
+  useEffect(() => {
+    if (currentView === "before") {
+      setViewedBefore(true)
+    } else {
+      setViewedAfter(true)
+    }
+  }, [currentView])
+  
+  useEffect(() => {
+    if (viewedBefore && viewedAfter) {
+      onBothViewed()
+    }
+  }, [viewedBefore, viewedAfter, onBothViewed])
+  
+  const photoData = photos && isBeforeAfter(photos) ? photos : null
+  const currentPhoto = photoData?.[currentView]
+  const hasValidPhoto = currentPhoto && !imageError[currentView]
+  
+  return (
+    <div className="flex flex-col items-center gap-4">
+      {/* Cute tab switcher */}
+      <div className="flex items-center gap-2 p-1.5 bg-white/80 rounded-full border-2 border-pink-200 shadow-lg">
+        <motion.button
+          onClick={() => setCurrentView("before")}
+          className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
+            currentView === "before" 
+              ? "bg-gradient-to-r from-pink-300 to-purple-300 text-white shadow-md" 
+              : "text-pink-400 hover:bg-pink-50"
+          }`}
+          whileTap={{ scale: 0.95 }}
+        >
+          {viewedBefore && <Check className="w-3 h-3" />}
+          До
+        </motion.button>
+        <motion.button
+          onClick={() => setCurrentView("after")}
+          className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
+            currentView === "after" 
+              ? "bg-gradient-to-r from-purple-300 to-blue-300 text-white shadow-md" 
+              : "text-purple-400 hover:bg-purple-50"
+          }`}
+          whileTap={{ scale: 0.95 }}
+        >
+          {viewedAfter && <Check className="w-3 h-3" />}
+          Після
+        </motion.button>
+      </div>
+      
+      {/* Photo frame with cute Korean webtoon style */}
+      <motion.div 
+        className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
+          padding: "6px",
+          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white"
+        }}
+        whileHover={{ scale: 1.02, rotate: currentView === "before" ? -1 : 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-white">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentView}
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 0.9, rotateY: currentView === "after" ? -90 : 90 }}
+              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+              exit={{ opacity: 0, scale: 0.9, rotateY: currentView === "after" ? 90 : -90 }}
+              transition={{ duration: 0.4, type: "spring" }}
+            >
+              {hasValidPhoto ? (
+                <Image
+                  src={currentPhoto.src || "/placeholder.svg"}
+                  alt={currentPhoto.alt}
+                  fill
+                  className="object-cover"
+                  onError={() => setImageError(prev => ({...prev, [currentView]: true}))}
+                  sizes="(max-width: 768px) 100vw, 320px"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+                  <motion.div
+                    className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center mb-4 shadow-lg"
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 10, -10, 0]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {currentView === "before" ? (
+                      <span className="text-4xl">🌙</span>
+                    ) : (
+                      <span className="text-4xl">⭐</span>
+                    )}
+                  </motion.div>
+                  <p className="text-pink-400 font-bold text-sm">
+                    {currentView === "before" ? "Фото ДО" : "Фото ПІСЛЯ"}
+                  </p>
+                  <p className="text-xs text-purple-300 mt-1">Валіка</p>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+          
+          {/* Cute decorative stickers */}
+          <motion.div 
+            className="absolute top-3 right-3 z-20"
+            animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
+              <span className="text-xl">{currentView === "before" ? "🌸" : "✨"}</span>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            className="absolute bottom-3 left-3 z-20"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <div className="px-3 py-1 rounded-full bg-white/90 shadow-lg">
+              <span className="text-xs font-bold text-pink-500">
+                {currentView === "before" ? "BEFORE" : "AFTER"}
+              </span>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+      
+      {/* Swipe navigation arrows */}
+      <div className="flex items-center gap-4">
+        <motion.button
+          onClick={() => setCurrentView("before")}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+            currentView === "before" 
+              ? "bg-pink-100 text-pink-300" 
+              : "bg-pink-200 text-white shadow-md hover:bg-pink-300"
+          }`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          disabled={currentView === "before"}
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </motion.button>
+        
+        <div className="flex gap-2">
+          <motion.div 
+            className={`w-3 h-3 rounded-full transition-all ${
+              currentView === "before" ? "bg-pink-400 scale-125" : "bg-pink-200"
+            }`}
+            layoutId="dot-indicator"
+          />
+          <motion.div 
+            className={`w-3 h-3 rounded-full transition-all ${
+              currentView === "after" ? "bg-purple-400 scale-125" : "bg-purple-200"
+            }`}
+          />
+        </div>
+        
+        <motion.button
+          onClick={() => setCurrentView("after")}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+            currentView === "after" 
+              ? "bg-purple-100 text-purple-300" 
+              : "bg-purple-200 text-white shadow-md hover:bg-purple-300"
+          }`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          disabled={currentView === "after"}
+        >
+          <ChevronRight className="w-5 h-5" />
+        </motion.button>
+      </div>
+      
+      {/* View status hint */}
+      {(!viewedBefore || !viewedAfter) && (
+        <motion.p 
+          className="text-xs text-pink-400 font-medium flex items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <span>Подивись обидві фотки</span>
+          <BouncingDots />
+        </motion.p>
+      )}
+    </div>
+  )
+}
+
+// Universal Photo Display - chooses between single or before/after
+function PhotoDisplay({ 
+  stepIndex,
+  onCanProceed
+}: { 
+  stepIndex: number
+  onCanProceed: () => void 
+}) {
+  const photos = getPhotoForStep(stepIndex)
+  
+  useEffect(() => {
+    if (!photos) {
+      // No photo config, auto-allow proceed
+      onCanProceed()
+    }
+  }, [photos, onCanProceed])
+  
+  if (!photos) {
+    return null
+  }
+  
+  if (isSinglePhoto(photos)) {
+    return <SinglePhotoFrame stepIndex={stepIndex} onViewed={onCanProceed} />
+  }
+  
+  if (isBeforeAfter(photos)) {
+    return <BeforeAfterCarousel stepIndex={stepIndex} onBothViewed={onCanProceed} />
+  }
+  
+  return null
+}
+
+// Cute Korean style button
+function KawaiiButton({ 
   children, 
   onClick, 
-  variant = "primary" 
+  variant = "primary",
+  disabled = false
 }: { 
   children: React.ReactNode
   onClick: () => void
   variant?: "primary" | "secondary"
+  disabled?: boolean
 }) {
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={disabled ? {} : { scale: 1.05, y: -2 }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
     >
       <Button 
         onClick={onClick}
         size="lg"
-        className={`text-lg px-8 py-6 rounded-2xl shadow-md transition-all ${
+        disabled={disabled}
+        className={`text-lg px-8 py-7 rounded-2xl transition-all border-3 font-bold ${
           variant === "primary"
-            ? "bg-rose hover:bg-rose/90 text-foreground border-2 border-rose/20"
-            : "bg-lavender/30 hover:bg-lavender/40 text-foreground border-2 border-lavender/30"
+            ? disabled 
+              ? "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"
+              : "bg-gradient-to-r from-pink-300 via-purple-300 to-pink-300 hover:from-pink-400 hover:via-purple-400 hover:to-pink-400 text-white border-white/50 shadow-lg shadow-pink-200/50"
+            : "bg-white/80 hover:bg-white text-pink-500 border-pink-200 shadow-md"
         }`}
+        style={{
+          boxShadow: disabled ? "none" : "0 8px 25px rgba(255, 183, 197, 0.4)"
+        }}
       >
         {children}
       </Button>
@@ -237,36 +547,44 @@ function KoreanButton({
   )
 }
 
-// Page 1: Welcome - Korean idol debut concept
+// Page 1: Welcome - Cute Korean idol concept
 function WelcomePage({ onNext }: { onNext: () => void }) {
   return (
     <motion.div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-cream via-background to-rose/10"
+      className="min-h-screen flex flex-col items-center justify-center p-6"
+      style={{
+        background: "linear-gradient(180deg, #FFF5F8 0%, #FFF0F5 30%, #F5F0FF 70%, #F0F8FF 100%)"
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, x: -100 }}
     >
       <LightstickEffect />
+      <FloatingKawaii />
       
       <motion.div
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-        className="text-center max-w-md"
+        className="text-center max-w-md z-10"
       >
-        {/* Korean style logo/badge */}
+        {/* Cute badge */}
         <motion.div 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose/10 border border-rose/20 mb-6"
-          animate={{ scale: [1, 1.02, 1] }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border-2 border-pink-200 shadow-lg mb-6"
+          animate={{ scale: [1, 1.03, 1], rotate: [0, 2, -2, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <Star className="w-4 h-4 text-rose fill-rose/50" />
-          <span className="text-sm font-medium text-rose">SPECIAL PROJECT</span>
-          <Star className="w-4 h-4 text-rose fill-rose/50" />
+          <span className="text-xl">🌟</span>
+          <span className="text-sm font-bold text-pink-500">SPECIAL PROJECT</span>
+          <span className="text-xl">🌟</span>
         </motion.div>
         
         <motion.h1 
-          className="text-4xl md:text-5xl font-bold text-foreground mb-3 tracking-tight"
+          className="text-5xl md:text-6xl font-black text-transparent bg-clip-text mb-3"
+          style={{
+            background: "linear-gradient(135deg, #FF6B9D, #C084FC, #60A5FA)",
+            WebkitBackgroundClip: "text",
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -275,7 +593,7 @@ function WelcomePage({ onNext }: { onNext: () => void }) {
         </motion.h1>
         
         <motion.p 
-          className="text-lg text-muted-foreground mb-2"
+          className="text-lg text-purple-400 mb-2 font-medium"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -283,27 +601,47 @@ function WelcomePage({ onNext }: { onNext: () => void }) {
           Терміново підготувати
         </motion.p>
         
-        <motion.h2
-          className="text-5xl md:text-6xl font-bold mb-6"
-          style={{ 
-            background: "linear-gradient(135deg, #e8b4bc, #c9b1d4, #b5c7d3)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent"
-          }}
+        <motion.div
+          className="relative inline-block mb-8"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, type: "spring" }}
         >
-          ВАЛІКА
-        </motion.h2>
+          <motion.h2
+            className="text-6xl md:text-7xl font-black"
+            style={{ 
+              background: "linear-gradient(135deg, #FFB7C5, #DDA0DD, #87CEEB)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 4px 20px rgba(255, 183, 197, 0.3)"
+            }}
+          >
+            ВАЛІКА
+          </motion.h2>
+          {/* Cute sparkles around name */}
+          <motion.span 
+            className="absolute -top-2 -right-4 text-2xl"
+            animate={{ rotate: [0, 20, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            ✨
+          </motion.span>
+          <motion.span 
+            className="absolute -bottom-1 -left-4 text-xl"
+            animate={{ rotate: [0, -20, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+          >
+            💫
+          </motion.span>
+        </motion.div>
         
         <motion.p 
-          className="text-muted-foreground mb-10"
+          className="text-purple-300 mb-10 text-lg"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          до дня народження
+          до дня народження 🎂
         </motion.p>
         
         <motion.div
@@ -311,88 +649,104 @@ function WelcomePage({ onNext }: { onNext: () => void }) {
           animate={{ scale: 1 }}
           transition={{ delay: 0.7, type: "spring" }}
         >
-          <KoreanButton onClick={onNext}>
+          <KawaiiButton onClick={onNext}>
             <Sparkles className="mr-2 w-5 h-5" />
-            Почати
-          </KoreanButton>
+            Почати!
+          </KawaiiButton>
         </motion.div>
       </motion.div>
       
-      {/* Decorative elements */}
+      {/* Cute bouncing decoration */}
       <motion.div 
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3"
+        className="absolute bottom-10 flex gap-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
       >
-        {[...Array(3)].map((_, i) => (
-          <motion.div
+        {["💖", "⭐", "🌸"].map((emoji, i) => (
+          <motion.span
             key={i}
-            className="w-2 h-2 rounded-full bg-rose/40"
-            animate={{ scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-          />
+            className="text-2xl"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+          >
+            {emoji}
+          </motion.span>
         ))}
       </motion.div>
     </motion.div>
   )
 }
 
-// Page 2: Process explanation - K-pop training concept
+// Page 2: Process explanation - Cute training concept
 function ExplanationPage({ onNext }: { onNext: () => void }) {
   const stages = [
-    { icon: Sparkles, label: "Енергія", desc: "100%", color: "bg-peach/50" },
-    { icon: Star, label: "Стиль", desc: "MAX", color: "bg-mint/50" },
-    { icon: Heart, label: "Харизма", desc: "FULL", color: "bg-rose/50" },
-    { icon: Crown, label: "Вайб", desc: "READY", color: "bg-lavender/50" },
+    { emoji: "⚡", label: "Енергія", desc: "100%", color: "from-yellow-200 to-orange-200" },
+    { emoji: "✨", label: "Стиль", desc: "MAX", color: "from-purple-200 to-pink-200" },
+    { emoji: "💖", label: "Харизма", desc: "FULL", color: "from-pink-200 to-red-200" },
+    { emoji: "🎉", label: "Вайб", desc: "READY", color: "from-blue-200 to-purple-200" },
   ]
   
   return (
     <motion.div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-lavender/10 via-background to-mint/10"
+      className="min-h-screen flex flex-col items-center justify-center p-6"
+      style={{
+        background: "linear-gradient(180deg, #F5F0FF 0%, #FFF0F5 50%, #F0FFF5 100%)"
+      }}
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
     >
+      <FloatingKawaii />
+      
       <motion.div 
-        className="text-center max-w-lg"
+        className="text-center max-w-lg z-10"
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
         <motion.div 
-          className="inline-block px-3 py-1 rounded-full bg-lavender/20 text-sm text-lavender mb-4"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border-2 border-purple-200 shadow-md mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          TRAINING PROGRAM
+          <span className="text-lg">📋</span>
+          <span className="text-sm font-bold text-purple-500">TRAINING PROGRAM</span>
         </motion.div>
         
-        <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-2 text-balance">
+        <h2 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text mb-2"
+          style={{
+            background: "linear-gradient(135deg, #FF6B9D, #C084FC)",
+            WebkitBackgroundClip: "text",
+          }}
+        >
           Крок за кроком
         </h2>
-        <p className="text-muted-foreground mb-8">
-          зробимо Валіка ідеальним
+        <p className="text-purple-400 mb-8 font-medium">
+          зробимо Валіка ідеальним ✨
         </p>
         
-        <div className="grid grid-cols-2 gap-3 mb-10">
-          {stages.map((stage, index) => {
-            const Icon = stage.icon
-            return (
-              <motion.div
-                key={index}
-                className={`${stage.color} p-5 rounded-2xl text-center border border-white/50`}
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
-                whileHover={{ scale: 1.03, y: -3 }}
+        <div className="grid grid-cols-2 gap-4 mb-10">
+          {stages.map((stage, index) => (
+            <motion.div
+              key={index}
+              className={`bg-gradient-to-br ${stage.color} p-5 rounded-2xl text-center border-2 border-white shadow-lg`}
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
+              whileHover={{ scale: 1.05, y: -5, rotate: index % 2 === 0 ? 2 : -2 }}
+            >
+              <motion.span 
+                className="text-3xl block mb-2"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: index * 0.2 }}
               >
-                <Icon className="w-6 h-6 mx-auto mb-2 text-foreground/70" />
-                <p className="font-semibold text-sm text-foreground">{stage.label}</p>
-                <p className="text-xs text-muted-foreground mt-1">{stage.desc}</p>
-              </motion.div>
-            )
-          })}
+                {stage.emoji}
+              </motion.span>
+              <p className="font-bold text-gray-700">{stage.label}</p>
+              <p className="text-xs text-gray-500 mt-1 font-medium">{stage.desc}</p>
+            </motion.div>
+          ))}
         </div>
         
         <motion.div
@@ -400,17 +754,17 @@ function ExplanationPage({ onNext }: { onNext: () => void }) {
           animate={{ scale: 1 }}
           transition={{ delay: 0.8, type: "spring" }}
         >
-          <KoreanButton onClick={onNext} variant="secondary">
-            Поїхали
+          <KawaiiButton onClick={onNext} variant="secondary">
+            Поїхали!
             <ArrowRight className="ml-2 w-5 h-5" />
-          </KoreanButton>
+          </KawaiiButton>
         </motion.div>
       </motion.div>
     </motion.div>
   )
 }
 
-// Pages 3-8: Preparation steps
+// Pages 3-8: Preparation steps with Before/After photos
 function PreparationPage({ 
   step, 
   title, 
@@ -425,8 +779,15 @@ function PreparationPage({
   onNext: () => void
   photo: string
 }) {
-  // step 3 = index 0, step 4 = index 1, etc.
   const photoIndex = step - 3
+  const [canProceed, setCanProceed] = useState(false)
+  const photos = getPhotoForStep(photoIndex)
+  const hasBeforeAfter = photos && isBeforeAfter(photos)
+  
+  // Reset canProceed when step changes
+  useEffect(() => {
+    setCanProceed(false)
+  }, [step])
   
   return (
     <motion.div 
@@ -435,7 +796,7 @@ function PreparationPage({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
     >
-      <FloatingSparkles />
+      <FloatingKawaii />
       <ProgressTracker currentStep={step} />
       
       <motion.div 
@@ -445,19 +806,28 @@ function PreparationPage({
         transition={{ delay: 0.3 }}
       >
         <motion.div 
-          className="inline-block px-3 py-1 rounded-full bg-foreground/5 text-xs text-muted-foreground mb-4 border border-foreground/10"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border-2 border-pink-200 shadow-md mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          STEP {step - 2} OF 6
+          <span className="text-lg">📍</span>
+          <span className="text-xs font-bold text-pink-500">STEP {step - 2} OF 6</span>
         </motion.div>
         
-        <h2 className="text-xl md:text-3xl font-bold text-foreground mb-2 text-balance">
+        <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text mb-2"
+          style={{
+            background: "linear-gradient(135deg, #FF6B9D, #C084FC, #60A5FA)",
+            WebkitBackgroundClip: "text",
+          }}
+        >
           {title}
         </h2>
-        <p className="text-sm text-muted-foreground mb-6">{subtitle}</p>
+        <p className="text-sm text-purple-400 mb-6 font-medium">{subtitle}</p>
         
-        <PhotoFrame stepIndex={photoIndex} />
+        <PhotoDisplay 
+          stepIndex={photoIndex}
+          onCanProceed={() => setCanProceed(true)} 
+        />
         
         <motion.div
           className="mt-8"
@@ -465,17 +835,31 @@ function PreparationPage({
           animate={{ scale: 1 }}
           transition={{ delay: 0.5, type: "spring" }}
         >
-          <KoreanButton onClick={onNext}>
-            Далі
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </KoreanButton>
+          <KawaiiButton onClick={onNext} disabled={!canProceed}>
+            {canProceed ? (
+              <>
+                Далі
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </>
+            ) : hasBeforeAfter ? (
+              <>
+                Подивись обидві фотки
+                <BouncingDots />
+              </>
+            ) : (
+              <>
+                Зачекай...
+                <BouncingDots />
+              </>
+            )}
+          </KawaiiButton>
         </motion.div>
       </motion.div>
     </motion.div>
   )
 }
 
-// Page 9: Final page - Concert stage concept
+// Page 9: Final page - Cute concert stage concept
 function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
   const [showConfetti, setShowConfetti] = useState(false)
   
@@ -485,28 +869,30 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
   
   return (
     <motion.div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-lavender/20 via-background to-rose/20 relative overflow-hidden"
+      className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, #FFF0F5 0%, #F5F0FF 50%, #F0F8FF 100%)"
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
       <LightstickEffect />
       
-      {/* Soft confetti */}
+      {/* Cute confetti */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none">
-          {Array.from({ length: 30 }).map((_, i) => (
+          {Array.from({ length: 40 }).map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 rounded-full"
+              className="absolute"
               style={{
-                background: ["#ffc0cb", "#e6e6fa", "#b5ead7", "#ffdab9", "#add8e6"][i % 5],
                 left: `${Math.random() * 100}%`,
               }}
-              initial={{ y: -20, opacity: 0.8, rotate: 0 }}
+              initial={{ y: -20, opacity: 1, rotate: 0 }}
               animate={{ 
                 y: typeof window !== 'undefined' ? window.innerHeight + 20 : 1000,
-                rotate: 360,
-                opacity: [0.8, 0.8, 0]
+                rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
+                opacity: [1, 1, 0]
               }}
               transition={{ 
                 duration: 4 + Math.random() * 2,
@@ -514,7 +900,11 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
                 repeat: Infinity,
                 repeatDelay: Math.random() * 2
               }}
-            />
+            >
+              <span className="text-xl">
+                {["🎉", "🎊", "⭐", "💖", "✨", "🌸", "🎀", "💫"][i % 8]}
+              </span>
+            </motion.div>
           ))}
         </div>
       )}
@@ -525,18 +915,23 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 100, delay: 0.2 }}
       >
+        {/* Cute badge */}
         <motion.div 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose/10 border border-rose/20 mb-6"
-          animate={{ scale: [1, 1.02, 1] }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border-2 border-pink-200 shadow-lg mb-6"
+          animate={{ scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <Crown className="w-4 h-4 text-rose" />
-          <span className="text-sm font-medium text-rose">DEBUT COMPLETE</span>
-          <Crown className="w-4 h-4 text-rose" />
+          <span className="text-xl">👑</span>
+          <span className="text-sm font-bold text-pink-500">DEBUT COMPLETE</span>
+          <span className="text-xl">👑</span>
         </motion.div>
         
         <motion.h1 
-          className="text-3xl md:text-5xl font-bold text-foreground mb-4"
+          className="text-4xl md:text-5xl font-black text-transparent bg-clip-text mb-4"
+          style={{
+            background: "linear-gradient(135deg, #FF6B9D, #C084FC, #60A5FA)",
+            WebkitBackgroundClip: "text",
+          }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -544,42 +939,41 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
           Валік готовий!
         </motion.h1>
         
-        {/* K-pop group stage visualization */}
+        {/* K-pop group stage visualization - cute version */}
         <motion.div 
           className="relative mb-8 py-8"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          {/* Stage spotlight effect */}
-          <div className="absolute inset-0 bg-gradient-radial from-rose/10 via-transparent to-transparent rounded-full blur-2xl" />
-          
-          <div className="relative flex items-end justify-center gap-2 md:gap-3">
-            {/* Group members silhouettes */}
+          <div className="relative flex items-end justify-center gap-3">
+            {/* Cute character silhouettes */}
             {[
-              { h: "h-24 md:h-32", delay: 0.1, bg: "bg-lavender/30" },
-              { h: "h-28 md:h-36", delay: 0.2, bg: "bg-lavender/40" },
-              { h: "h-32 md:h-44", delay: 0, bg: "bg-rose/50", isMain: true },
-              { h: "h-28 md:h-36", delay: 0.3, bg: "bg-lavender/40" },
-              { h: "h-24 md:h-32", delay: 0.4, bg: "bg-lavender/30" },
+              { h: "h-20", delay: 0.1, emoji: "🧑" },
+              { h: "h-24", delay: 0.2, emoji: "🧑" },
+              { h: "h-28", delay: 0, emoji: "⭐", isMain: true },
+              { h: "h-24", delay: 0.3, emoji: "🧑" },
+              { h: "h-20", delay: 0.4, emoji: "🧑" },
             ].map((member, i) => (
               <motion.div 
                 key={i}
-                className={`${member.h} ${member.bg} rounded-t-full ${
-                  member.isMain ? "w-16 md:w-20 border-2 border-rose/30" : "w-12 md:w-14"
-                } relative flex items-center justify-center`}
-                animate={{ y: [0, member.isMain ? -8 : -4, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: member.delay }}
+                className={`${member.h} ${
+                  member.isMain 
+                    ? "w-16 bg-gradient-to-t from-pink-300 to-purple-300 border-2 border-white" 
+                    : "w-12 bg-gradient-to-t from-purple-200 to-pink-200"
+                } rounded-t-full relative flex items-center justify-center shadow-lg`}
+                animate={{ y: [0, member.isMain ? -10 : -5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: member.delay }}
               >
                 {member.isMain && (
                   <>
-                    <span className="text-foreground/70 font-bold text-xs">V</span>
+                    <span className="text-white font-black text-lg">V</span>
                     <motion.div 
-                      className="absolute -top-3"
-                      animate={{ rotate: [0, 10, -10, 0] }}
+                      className="absolute -top-4"
+                      animate={{ rotate: [0, 15, -15, 0], y: [0, -3, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <Crown className="w-5 h-5 text-rose fill-rose/30" />
+                      <span className="text-2xl">👑</span>
                     </motion.div>
                   </>
                 )}
@@ -587,35 +981,23 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
             ))}
           </div>
           
-          {/* Stage platform */}
-          <div className="w-full h-4 bg-gradient-to-r from-lavender/30 via-rose/40 to-lavender/30 rounded-lg mt-2" />
-          
-          {/* Stage lights */}
-          <motion.div 
-            className="absolute -top-4 left-1/4 w-2 h-12 bg-gradient-to-b from-peach/40 to-transparent rounded-full blur-sm"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute -top-4 right-1/4 w-2 h-12 bg-gradient-to-b from-rose/40 to-transparent rounded-full blur-sm"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
-          />
+          {/* Cute stage platform */}
+          <div className="w-full h-4 bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 rounded-lg mt-2 border-2 border-white shadow-md" />
           
           {/* Label */}
           <motion.div 
-            className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-foreground/5 rounded-full text-xs text-muted-foreground"
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border-2 border-pink-100"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            <Music className="w-3 h-3" />
-            <span>K-pop Group Concept</span>
-            <Sparkles className="w-3 h-3" />
+            <span className="text-lg">🎤</span>
+            <span className="text-xs font-bold text-purple-500">K-pop Star</span>
+            <span className="text-lg">🎵</span>
           </motion.div>
         </motion.div>
         
-        {/* CTA Button with Korean style pulse */}
+        {/* CTA Button */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -623,29 +1005,13 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
         >
           <motion.div
             className="relative inline-block"
-            animate={{ 
-              scale: [1, 1.02, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
           >
-            {/* Glow effect */}
-            <motion.div
-              className="absolute inset-0 rounded-2xl"
-              style={{ background: "linear-gradient(135deg, #ffc0cb, #e6e6fa)" }}
-              animate={{ 
-                opacity: [0.3, 0.5, 0.3],
-                scale: [1, 1.1, 1]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <Button 
-              onClick={onCelebrate}
-              size="lg"
-              className="relative bg-gradient-to-r from-rose via-lavender to-rose hover:opacity-90 text-foreground text-lg px-10 py-7 rounded-2xl shadow-lg transition-all border-2 border-white/30"
-            >
+            <KawaiiButton onClick={onCelebrate}>
               <Heart className="mr-2 w-5 h-5 fill-current" />
-              Привітання
-            </Button>
+              Привітання 💝
+            </KawaiiButton>
           </motion.div>
         </motion.div>
       </motion.div>
@@ -653,39 +1019,47 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
   )
 }
 
-// Celebration modal - Korean style
+// Celebration modal - Cute Korean style
 function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   if (!isOpen) return null
   
   return (
     <motion.div 
-      className="fixed inset-0 bg-foreground/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       onClick={onClose}
     >
       <motion.div 
-        className="bg-background rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-rose/20"
-        initial={{ scale: 0.8, y: 50 }}
-        animate={{ scale: 1, y: 0 }}
+        className="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-4 border-pink-200"
+        style={{
+          background: "linear-gradient(180deg, #FFFFFF 0%, #FFF5F8 100%)"
+        }}
+        initial={{ scale: 0.8, y: 50, rotate: -5 }}
+        animate={{ scale: 1, y: 0, rotate: 0 }}
         transition={{ type: "spring", stiffness: 200 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Korean style header decoration */}
-        <div className="flex justify-center gap-1 mb-4">
-          {[...Array(5)].map((_, i) => (
-            <motion.div
+        {/* Cute header */}
+        <div className="flex justify-center gap-2 mb-4">
+          {["🎉", "🎂", "🎁", "🎈", "🎊"].map((emoji, i) => (
+            <motion.span
               key={i}
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+              className="text-2xl"
+              animate={{ y: [0, -10, 0], rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
             >
-              <Star className="w-4 h-4 text-rose fill-rose/50" />
-            </motion.div>
+              {emoji}
+            </motion.span>
           ))}
         </div>
         
         <motion.h2 
-          className="text-2xl font-bold text-foreground mb-2"
+          className="text-2xl font-black text-transparent bg-clip-text mb-2"
+          style={{
+            background: "linear-gradient(135deg, #FF6B9D, #C084FC)",
+            WebkitBackgroundClip: "text",
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
@@ -693,50 +1067,51 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         </motion.h2>
         
         <motion.p
-          className="text-4xl font-bold mb-4"
+          className="text-5xl font-black mb-4"
           style={{ 
-            background: "linear-gradient(135deg, #e8b4bc, #c9b1d4)",
+            background: "linear-gradient(135deg, #FFB7C5, #DDA0DD, #87CEEB)",
             WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent"
+            WebkitTextFillColor: "transparent",
           }}
           initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2 }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
         >
           ВАЛІК
         </motion.p>
         
-        <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
-          Бажаємо щастя, здоровʼя, успіхів і ще багато крутих днів народження! Ти найкращий!
+        <p className="text-purple-400 mb-6 text-sm leading-relaxed font-medium">
+          Бажаємо щастя, здоровʼя, успіхів і ще багато крутих днів народження! 
+          <br />Ти найкращий! 💖
         </p>
         
-        <div className="flex justify-center gap-2 mb-6">
-          {[Heart, Star, Sparkles, Crown, Music].map((Icon, i) => (
-            <motion.div
+        <div className="flex justify-center gap-3 mb-6">
+          {["💖", "⭐", "✨", "🌸", "💫"].map((emoji, i) => (
+            <motion.span
               key={i}
+              className="text-xl"
               animate={{ 
-                y: [0, -6, 0],
-                rotate: [0, 5, -5, 0]
+                y: [0, -8, 0],
+                scale: [1, 1.2, 1]
               }}
               transition={{ 
-                duration: 1.5, 
+                duration: 1, 
                 repeat: Infinity,
-                delay: i * 0.15
+                delay: i * 0.12
               }}
             >
-              <Icon className="w-5 h-5 text-rose fill-rose/30" />
-            </motion.div>
+              {emoji}
+            </motion.span>
           ))}
         </div>
         
-        <p className="text-xs text-muted-foreground italic mb-4">
-          Зроблено з любовʼю
+        <p className="text-xs text-pink-300 italic mb-4">
+          Зроблено з любовʼю 💝
         </p>
         
-        <KoreanButton onClick={onClose}>
-          <Heart className="mr-2 w-4 h-4 fill-current" />
-          Дякую!
-        </KoreanButton>
+        <KawaiiButton onClick={onClose}>
+          Дякую! 🥰
+        </KawaiiButton>
       </motion.div>
     </motion.div>
   )
@@ -751,38 +1126,38 @@ export default function BirthdayWizard() {
     { 
       step: 3, 
       title: "Підзаряджаємо енергію", 
-      subtitle: "Level up to maximum power",
-      bgGradient: "bg-gradient-to-b from-peach/20 via-background to-mint/10" 
+      subtitle: "Level up to maximum power ⚡",
+      bgGradient: "bg-gradient-to-b from-yellow-50 via-orange-50/50 to-pink-50" 
     },
     { 
       step: 4, 
       title: "Стиль на максимум", 
-      subtitle: "Fashion mode: activated",
-      bgGradient: "bg-gradient-to-b from-mint/20 via-background to-lavender/10" 
+      subtitle: "Fashion mode: activated ✨",
+      bgGradient: "bg-gradient-to-b from-purple-50 via-pink-50/50 to-blue-50" 
     },
     { 
       step: 5, 
       title: "Харизма завантажується", 
-      subtitle: "Loading charisma... 89%",
-      bgGradient: "bg-gradient-to-b from-rose/20 via-background to-peach/10" 
+      subtitle: "Loading charisma... 89% 💖",
+      bgGradient: "bg-gradient-to-b from-pink-50 via-rose-50/50 to-purple-50" 
     },
     { 
       step: 6, 
       title: "Режим \"День Народження\"", 
-      subtitle: "Birthday mode: ON",
-      bgGradient: "bg-gradient-to-b from-lavender/20 via-background to-rose/10" 
+      subtitle: "Birthday mode: ON 🎂",
+      bgGradient: "bg-gradient-to-b from-blue-50 via-purple-50/50 to-pink-50" 
     },
     { 
       step: 7, 
       title: "Збираємо команду", 
-      subtitle: "Squad assembled",
-      bgGradient: "bg-gradient-to-b from-sky/20 via-background to-mint/10" 
+      subtitle: "Squad assembled 🎤",
+      bgGradient: "bg-gradient-to-b from-cyan-50 via-blue-50/50 to-purple-50" 
     },
     { 
       step: 8, 
       title: "Фінальні штрихи", 
-      subtitle: "Almost ready for debut",
-      bgGradient: "bg-gradient-to-b from-mint/20 via-background to-rose/10" 
+      subtitle: "Almost ready for debut 🌟",
+      bgGradient: "bg-gradient-to-b from-green-50 via-teal-50/50 to-blue-50" 
     },
   ]
   
