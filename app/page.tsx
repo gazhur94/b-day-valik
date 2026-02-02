@@ -486,12 +486,6 @@ function PhotoDisplay({
   onCanProceed: () => void 
 }) {
   const photos = getPhotoForStep(stepIndex)
-  const [canProceed, setCanProceed] = useState(false)
-  
-  // Reset canProceed when step changes
-  useEffect(() => {
-    setCanProceed(false)
-  }, [stepIndex])
   
   useEffect(() => {
     if (!photos) {
@@ -505,11 +499,11 @@ function PhotoDisplay({
   }
   
   if (isSinglePhoto(photos)) {
-    return <SinglePhotoFrame stepIndex={stepIndex} onViewed={() => setCanProceed(true)} />
+    return <SinglePhotoFrame stepIndex={stepIndex} onViewed={onCanProceed} />
   }
   
   if (isBeforeAfter(photos)) {
-    return <BeforeAfterCarousel stepIndex={stepIndex} onBothViewed={() => setCanProceed(true)} />
+    return <BeforeAfterCarousel stepIndex={stepIndex} onBothViewed={onCanProceed} />
   }
   
   return null
