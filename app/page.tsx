@@ -209,7 +209,8 @@ function SinglePhotoFrame({
         style={{
           background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
           padding: "6px",
-          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white"
+          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white",
+          width: "400px"
         }}
         whileHover={{ scale: 1.02, rotate: 1 }}
         transition={{ duration: 0.3 }}
@@ -343,7 +344,8 @@ function BeforeAfterCarousel({
         style={{
           background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
           padding: "6px",
-          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white"
+          boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white",
+          width: "400px"
         }}
         whileHover={{ scale: 1.02, rotate: currentView === "before" ? -1 : 1 }}
         transition={{ duration: 0.3 }}
