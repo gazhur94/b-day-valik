@@ -807,15 +807,6 @@ function PreparationPage({
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <motion.div 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border-2 border-pink-200 shadow-md mb-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <span className="text-lg">📍</span>
-          <span className="text-xs font-bold text-pink-500">STEP {step - 2} 7</span>
-        </motion.div>
-        
         <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text mb-2"
           style={{
             background: "linear-gradient(135deg, #FF6B9D, #C084FC, #60A5FA)",
