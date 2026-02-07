@@ -1098,7 +1098,7 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
           <br />Ти найкращий! 💖
         </p>
         
-        <div className="flex justify-center gap-3 mb-6">
+       {/* <div className="flex justify-center gap-3 mb-6">
           {["💖", "⭐", "✨", "🌸", "💫"].map((emoji, i) => (
             <motion.span
               key={i}
@@ -1116,7 +1116,7 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
               {emoji}
             </motion.span>
           ))}
-        </div>
+        </div>*/}
         
         <p className="text-xs text-pink-300 italic mb-4">
           Зроблено з любовʼю 💝
