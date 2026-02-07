@@ -467,14 +467,14 @@ function BeforeAfterCarousel({
       
       {/* View status hint */}
       {(!viewedBefore || !viewedAfter) && (
-        <motion.p 
+        <motion.div
           className="text-xs text-pink-400 font-medium flex items-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           <span>Подивись обидві фотки</span>
           <BouncingDots />
-        </motion.p>
+        </motion.div>
       )}
     </div>
   )
