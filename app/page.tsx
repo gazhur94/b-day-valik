@@ -1022,7 +1022,7 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cute header */}
-        <div className="flex justify-center gap-2 mb-4">
+     {/*   <div className="flex justify-center gap-2 mb-4">
           {["🎉", "🎂", "🎁", "🎈", "🎊"].map((emoji, i) => (
             <motion.span
               key={i}
@@ -1033,7 +1033,7 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
               {emoji}
             </motion.span>
           ))}
-        </div>
+        </div>*/}
         
         <motion.h2 
           className="text-2xl font-black text-transparent bg-clip-text mb-2"
@@ -1093,8 +1093,8 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
           </div>
         </motion.div>
         
-        <p className="text-purple-400 mb-6 text-sm leading-relaxed font-medium">
-          Бажаємо щастя, здоровʼя, успіхів і ще багато крутих днів народження! 
+        <p className="text-purple-400 mb-3 text-sm leading-relaxed font-medium">
+          Дорогий Валентин! Вітаємо тебе з днем народження. Бажаємо купу нових свістопєрделок у новому році. Щоб світло світило, коліна не хрустіли, бакс був по 20, а в професійних порадах Діани не було потреби. Гаврики тебе люблять і обіймають.
           <br />Ти найкращий! 💖
         </p>
         
@@ -1118,9 +1118,9 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
           ))}
         </div>*/}
         
-        <p className="text-xs text-pink-300 italic mb-4">
+        {/*<p className="text-xs text-pink-300 italic mb-4">
           Зроблено з любовʼю 💝
-        </p>
+        </p>*/}
         
         <KawaiiButton onClick={onClose}>
           Дякую! 🥰
