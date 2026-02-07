@@ -102,12 +102,13 @@ function LightstickEffect() {
 // Cute progress tracker with Korean webtoon aesthetic
 function ProgressTracker({ currentStep }: { currentStep: number }) {
   const steps = [
-    { icon: Sparkles, label: "Енергія", emoji: "⚡" },
-    { icon: Star, label: "Стиль", emoji: "✨" },
-    { icon: Heart, label: "Харизма", emoji: "💖" },
-    { icon: Crown, label: "Свято", emoji: "🎂" },
-    { icon: Mic2, label: "Репетиція", emoji: "🎤" },
-    { icon: Music, label: "Фініш", emoji: "🎵" },
+    { icon: Sparkles, label: "Масочка", emoji: "💆‍♂️" },
+    { icon: Star, label: "Волосся", emoji: "🧔‍♂️" },
+    { icon: Heart, label: "Догляд", emoji: "🦸" },
+    { icon: Crown, label: "Любов", emoji: "❤️" },
+    { icon: Mic2, label: "Ще любов", emoji: "💖" },
+    { icon: Music, label: "Більше любові", emoji: "💞" },
+    { icon: Music, label: "Максимум любові", emoji: "💗" },
   ]
   
   const activeIndex = currentStep - 3
@@ -683,10 +684,10 @@ function WelcomePage({ onNext }: { onNext: () => void }) {
 // Page 2: Process explanation - Cute training concept
 function ExplanationPage({ onNext }: { onNext: () => void }) {
   const stages = [
-    { emoji: "⚡", label: "Енергія", desc: "100%", color: "from-yellow-200 to-orange-200" },
-    { emoji: "✨", label: "Стиль", desc: "MAX", color: "from-purple-200 to-pink-200" },
-    { emoji: "💖", label: "Харизма", desc: "FULL", color: "from-pink-200 to-red-200" },
+    { emoji: "⚡", label: "Масочка", desc: "100%", color: "from-yellow-200 to-orange-200" },
+    { emoji: "✨", label: "Волосся", desc: "MAX", color: "from-purple-200 to-pink-200" },
     { emoji: "🎉", label: "Вайб", desc: "READY", color: "from-blue-200 to-purple-200" },
+    { emoji: "💖", label: "Любов", desc: "FULL", color: "from-pink-200 to-red-200" },
   ]
   
   return (
@@ -779,7 +780,6 @@ function PreparationPage({
   subtitle: string
   bgGradient: string
   onNext: () => void
-  photo: string
 }) {
   const photoIndex = step - 3
   const [canProceed, setCanProceed] = useState(false)
@@ -940,63 +940,51 @@ function FinalPage({ onCelebrate }: { onCelebrate: () => void }) {
         >
           Валік готовий!
         </motion.h1>
-        
-        {/* K-pop group stage visualization - cute version */}
-        <motion.div 
-          className="relative mb-8 py-8"
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
+
+        <motion.div
+            className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
+              padding: "6px",
+              boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white",
+              width: "400px"
+            }}
+            whileHover={{ scale: 1.02, rotate: 1 }}
+            transition={{ duration: 0.3 }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
         >
-          <div className="relative flex items-end justify-center gap-3">
-            {/* Cute character silhouettes */}
-            {[
-              { h: "h-20", delay: 0.1, emoji: "🧑" },
-              { h: "h-24", delay: 0.2, emoji: "🧑" },
-              { h: "h-28", delay: 0, emoji: "⭐", isMain: true },
-              { h: "h-24", delay: 0.3, emoji: "🧑" },
-              { h: "h-20", delay: 0.4, emoji: "🧑" },
-            ].map((member, i) => (
-              <motion.div 
-                key={i}
-                className={`${member.h} ${
-                  member.isMain 
-                    ? "w-16 bg-gradient-to-t from-pink-300 to-purple-300 border-2 border-white" 
-                    : "w-12 bg-gradient-to-t from-purple-200 to-pink-200"
-                } rounded-t-full relative flex items-center justify-center shadow-lg`}
-                animate={{ y: [0, member.isMain ? -10 : -5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: member.delay }}
-              >
-                {member.isMain && (
-                  <>
-                    <span className="text-white font-black text-lg">V</span>
-                    <motion.div 
-                      className="absolute -top-4"
-                      animate={{ rotate: [0, 15, -15, 0], y: [0, -3, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <span className="text-2xl">👑</span>
-                    </motion.div>
-                  </>
-                )}
-              </motion.div>
-            ))}
+          <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-white">
+              <Image
+                  src={"/photos/step-finish.png"}
+                  alt="Final look of Valik"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 320px"
+              />
+            )
+
+            {/* Cute decorative stickers */}
+            <motion.div
+                className="absolute top-3 right-3 z-20"
+                animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
+                <span className="text-xl">✨</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+                className="absolute bottom-3 left-3 z-20"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <div className="px-3 py-1 rounded-full bg-white/90 shadow-lg">
+                <span className="text-xs font-bold text-pink-500">VALIK</span>
+              </div>
+            </motion.div>
           </div>
-          
-          {/* Cute stage platform */}
-          <div className="w-full h-4 bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 rounded-lg mt-2 border-2 border-white shadow-md" />
-          
-          {/* Label */}
-          <motion.div 
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border-2 border-pink-100"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-          >
-            <span className="text-lg">🎤</span>
-            <span className="text-xs font-bold text-purple-500">K-pop Star</span>
-            <span className="text-lg">🎵</span>
-          </motion.div>
         </motion.div>
         
         {/* CTA Button */}
@@ -1081,6 +1069,52 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         >
           ВАЛІК
         </motion.p>
+
+        <motion.div
+            className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
+              padding: "6px",
+              boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white",
+              width: "400px"
+            }}
+            whileHover={{ scale: 1.02, rotate: 1 }}
+            transition={{ duration: 0.3 }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+        >
+          <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-white">
+            <Image
+                src={"/photos/step-last.jpg"}
+                alt="Final look of Valik"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 320px"
+            />
+            )
+
+            {/* Cute decorative stickers */}
+            <motion.div
+                className="absolute top-3 right-3 z-20"
+                animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
+                <span className="text-xl">✨</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+                className="absolute bottom-3 left-3 z-20"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <div className="px-3 py-1 rounded-full bg-white/90 shadow-lg">
+                <span className="text-xs font-bold text-pink-500">VALIK</span>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
         
         <p className="text-purple-400 mb-6 text-sm leading-relaxed font-medium">
           Бажаємо щастя, здоровʼя, успіхів і ще багато крутих днів народження! 
@@ -1127,39 +1161,45 @@ export default function BirthdayWizard() {
   const preparationSteps = [
     { 
       step: 3, 
-      title: "Підзаряджаємо енергію", 
-      subtitle: "Level up to maximum power ⚡",
+      title: "Робимо масочку",
+      subtitle: "Skincare level: Expert 🧖‍♀️",
       bgGradient: "bg-gradient-to-b from-yellow-50 via-orange-50/50 to-pink-50" 
     },
     { 
       step: 4, 
-      title: "Стиль на максимум", 
-      subtitle: "Fashion mode: activated ✨",
+      title: "Позбуваємось пушку",
+      subtitle: "Hair removal: Activated 🪒",
       bgGradient: "bg-gradient-to-b from-purple-50 via-pink-50/50 to-blue-50" 
     },
     { 
       step: 5, 
-      title: "Харизма завантажується", 
-      subtitle: "Loading charisma... 89% 💖",
+      title: "Anti-age терапія",
+      subtitle: "Glowing up: In progress ✨",
       bgGradient: "bg-gradient-to-b from-pink-50 via-rose-50/50 to-purple-50" 
     },
     { 
       step: 6, 
-      title: "Режим \"День Народження\"", 
-      subtitle: "Birthday mode: ON 🎂",
+      title: "Додаємо любові",
+      subtitle: "Love boost 💖",
       bgGradient: "bg-gradient-to-b from-blue-50 via-purple-50/50 to-pink-50" 
     },
     { 
       step: 7, 
-      title: "Збираємо команду", 
-      subtitle: "Squad assembled 🎤",
+      title: "Ще трішки любові",
+      subtitle: "Love overload 💘",
       bgGradient: "bg-gradient-to-b from-cyan-50 via-blue-50/50 to-purple-50" 
     },
     { 
       step: 8, 
-      title: "Фінальні штрихи", 
-      subtitle: "Almost ready for debut 🌟",
+      title: "І ще більше любові",
+      subtitle: "Love MAX 💝",
       bgGradient: "bg-gradient-to-b from-green-50 via-teal-50/50 to-blue-50" 
+    },
+    {
+      step: 9,
+      title: "Любов на максімум",
+      subtitle: "Love infinite 💞💞💞",
+      bgGradient: "bg-gradient-to-b from-green-50 via-teal-50/50 to-blue-50"
     },
   ]
   
@@ -1171,15 +1211,15 @@ export default function BirthdayWizard() {
         {currentPage === 1 && (
           <WelcomePage key="welcome" onNext={nextPage} />
         )}
-        
-        {currentPage === 2 && (
+
+       {/* {currentPage === 2 && (
           <ExplanationPage key="explanation" onNext={nextPage} />
-        )}
+        )}*/}
         
-        {currentPage >= 3 && currentPage <= 8 && (
+        {currentPage >= 2 && currentPage <= 8 && (
           <PreparationPage 
             key={`prep-${currentPage}`}
-            {...preparationSteps[currentPage - 3]}
+            {...preparationSteps[currentPage - 2]}
             onNext={nextPage}
           />
         )}
