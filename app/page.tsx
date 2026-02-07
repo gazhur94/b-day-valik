@@ -813,7 +813,7 @@ function PreparationPage({
           animate={{ opacity: 1 }}
         >
           <span className="text-lg">📍</span>
-          <span className="text-xs font-bold text-pink-500">STEP {step - 2} OF 6</span>
+          <span className="text-xs font-bold text-pink-500">STEP {step - 2} 7</span>
         </motion.div>
         
         <h2 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text mb-2"
@@ -1055,20 +1055,6 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         >
           З Днем Народження!
         </motion.h2>
-        
-        <motion.p
-          className="text-5xl font-black mb-4"
-          style={{ 
-            background: "linear-gradient(135deg, #FFB7C5, #DDA0DD, #87CEEB)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-          initial={{ scale: 0.9 }}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          ВАЛІК
-        </motion.p>
 
         <motion.div
             className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
