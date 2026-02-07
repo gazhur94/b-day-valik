@@ -815,8 +815,10 @@ function PreparationPage({
         >
           {title}
         </h2>
+{/*
         <p className="text-sm text-purple-400 mb-6 font-medium">{subtitle}</p>
-        
+*/}
+
         <PhotoDisplay 
           stepIndex={photoIndex}
           onCanProceed={() => setCanProceed(true)} 
@@ -1047,20 +1049,8 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
           З Днем Народження!
         </motion.h2>
 
-        <motion.div
-            className="relative w-full max-w-xs aspect-[3/4] rounded-[2rem] overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #FFE4EC, #E8E4FF, #E4F4FF)",
-              padding: "6px",
-              boxShadow: "0 10px 40px rgba(255, 183, 197, 0.3), 0 0 0 4px white",
-              width: "400px"
-            }}
-            whileHover={{ scale: 1.02, rotate: 1 }}
-            transition={{ duration: 0.3 }}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-        >
-          <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-white">
+
+          <div className="relative w-75 h-75 rounded-[1.6rem] overflow-hidden bg-white">
             <Image
                 src={"/photos/step-last.jpg"}
                 alt="Final look of Valik"
@@ -1091,9 +1081,8 @@ function CelebrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
               </div>
             </motion.div>
           </div>
-        </motion.div>
         
-        <p className="text-purple-400 mb-3 text-sm leading-relaxed font-medium">
+        <p className="text-purple-400 mt-2 mb-3 text-sm leading-relaxed font-medium">
           Дорогий Валентин! Вітаємо тебе з днем народження. Бажаємо купу нових свістопєрделок у новому році. Щоб світло світило, коліна не хрустіли, бакс був по 20, а в професійних порадах Діани не було потреби. Гаврики тебе люблять і обіймають.
           <br />Ти найкращий! 💖
         </p>
