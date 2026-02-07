@@ -114,7 +114,7 @@ function ProgressTracker({ currentStep }: { currentStep: number }) {
   const activeIndex = currentStep - 3
   
   return (
-    <div className="w-full max-w-2xl mx-auto mb-8 px-4">
+    <div className="w-full max-w-2xl mx-auto mb-3 px-4">
       <div className="relative">
         {/* Background track with cute dashed line */}
         <div className="absolute top-6 left-0 right-0 h-2 bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100 rounded-full border-2 border-dashed border-pink-200" />
@@ -793,7 +793,7 @@ function PreparationPage({
   
   return (
     <motion.div 
-      className={`min-h-screen flex flex-col items-center p-6 pt-20 ${bgGradient}`}
+      className={`min-h-screen flex flex-col items-center p-6 pt-6 ${bgGradient}`}
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
